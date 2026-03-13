@@ -21,3 +21,26 @@ section {
     font-weight: 500;
 }
 
+#loginForm p {
+    color: red;
+    font-size: 16px;
+    font-weight: 500;
+    height: 20px;
+}
+
+#loginForm input {
+    margin-bottom: 20px;
+}
+
+#login label {
+    margin-top: 10px;
+}
+
+.passwordForgotten {
+    text-decoration: underline;
+}
+
+.passwordForgotten:hover {
+    cursor: pointer;
+}
+
