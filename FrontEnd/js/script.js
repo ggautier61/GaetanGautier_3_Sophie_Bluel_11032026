@@ -114,3 +114,5 @@ fetch('http://localhost:5678/api/categories')
 
 }).catch(error => console.log(error))
 
+
+
