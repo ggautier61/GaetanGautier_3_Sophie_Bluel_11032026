@@ -1,11 +1,42 @@
+let params = new URLSearchParams (document.location.href.split('?')[1]);
+let userConneted = params.get("connected");
+console.log('userConnected', userConneted)
+
 //Initialisation du container
 let gallery = document.querySelectorAll("#portfolio .gallery");
 let portfolio = document.querySelector('#portfolio')
 let h2Filter = document.querySelector('#portfolio h2')
-let divFilterContainer = document.createElement("div");
+let divFilterContainer = document.querySelectorAll('#portfolio .filterContainer')[0]
+// let divFilterContainer = document.createElement("div");
+// divFilterContainer.classList.add('filterContainer')
 let filterButtons;
 let projectsList;
 let projectsListFiltered;
+
+if (userConneted) {
+    let buttons = document.querySelectorAll('nav li a')
+    let editButton = document.querySelectorAll('#portfolio .editButton')[0]
+
+    buttons.forEach(btn => {
+        if (btn.textContent === "login") {
+            btn.textContent = "logout"
+        }
+    })
+
+    editButton.setAttribute('style', "display: flex;");
+
+    divFilterContainer.setAttribute('style', "display: none;");
+
+    editButton.addEventListener('click', function(event) {
+        event.preventDefault()
+
+        console.log('vous voulez modifier !!!')
+    })
+
+
+}
+
+
 
 
 function displayProject(project) {
@@ -27,11 +58,8 @@ function displayProject(project) {
 }
 
 function displayFilterAll() {
-    h2Filter.after(divFilterContainer)
-    divFilterContainer.classList.add('filterContainer')
 
     let divFilterAll = document.createElement('div')
-    // divFilterAll.classList.add('')
     divFilterAll.textContent = 'Tous'
     divFilterAll.id = 'filterButton_' + 0
     divFilterAll.classList.add('filterButton')
@@ -46,7 +74,6 @@ function displayCategory(category) {
     divCategory.textContent = category.name
     divCategory.classList.add('filterButton')
     divFilterContainer.appendChild(divCategory)
-
 
 }
 

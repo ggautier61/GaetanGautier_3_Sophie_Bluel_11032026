@@ -146,6 +146,17 @@ li:hover, li a:hover {
 	margin-bottom: 50px;
 }
 
+.editButton {
+	position: absolute;
+	right: -120px;
+	top: 10px;
+	display: none;
+}
+
+.editButton:hover {
+	cursor: pointer;
+}
+
 .filterButton {
 	border: 1px solid #1D6154;
 	border-radius: 30px;
@@ -226,6 +237,7 @@ input[type="submit"]{
 
 input[type="submit"]:hover {
 	cursor: pointer;
+	background-color: #0E2F28;
 }
 
 footer nav ul {
