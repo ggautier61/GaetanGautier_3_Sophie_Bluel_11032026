@@ -70,6 +70,7 @@ function displayProjectDialog(project) {
 
     let figure = document.createElement('figure')
     figure.setAttribute('style', 'position: relative;')
+    figure.id = 'projectFigure_' + project.id
     galleryList.appendChild(figure)
 
     let img = document.createElement('img');
@@ -86,15 +87,42 @@ function displayProjectDialog(project) {
     deleteProjetButton.classList.add('fa-solid')
     deleteProjetButton.classList.add('fa-trash-can')
     deleteProjetButton.setAttribute('style', 'position: static;')
-    deleteProjetButton.id = "projet_" + project.id
+    deleteProjetButton.id = "projetDeleteButton_" + project.id
     divDeleteButton.appendChild(deleteProjetButton)
     
     figure.appendChild(divDeleteButton)
 
-    deleteProjetButton.addEventListener('click', function(event) {
+    deleteProjetButton.addEventListener('click', async function(event) {
         event.preventDefault()
 
+        //TODO : Récupérer le token après login
+        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MzQ4MzEyNywiZXhwIjoxNzczNTY5NTI3fQ.GQ4D0UV37iztYlAsXtBXz3qG6p6AMxkF1DOXWRnhpAY'
+        
+        
         //suppresion du projet au clique du bouton deleteProjetButton
+        try {
+            await fetch("http://localhost:5678/api/works/" + project.id, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": 'Bearer ' + token
+                }
+            })
+            .then((res) => {
+                if (res.ok) {
+                    //suppression de la figure correspondante
+                    let figureProjet = document.getElementById('projectFigure_' + project.id)
+                    galleryList.removeChild(figureProjet)
+                    
+                }
+                else {
+                    alert('Impossible de supprimer le projet !')
+                    console.log('projet ' + project.id + " non supprimé")
+                }
+            });
+        } catch (error) {
+            
+        }
         console.log('suppression du projet ' + project.id)
     })
 
