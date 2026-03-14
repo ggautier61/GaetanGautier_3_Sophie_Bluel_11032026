@@ -14,14 +14,11 @@ let projectsList;
 let projectsListFiltered;
 
 
-
-
-
-
 function displayProject(project) {
 
     //Ajout de la Card
     let figure = document.createElement("figure");
+    figure.id = "project_" + project.id
     gallery[0].appendChild(figure);
 
     let divImg = document.createElement("img");
@@ -70,7 +67,7 @@ function displayProjectDialog(project) {
 
     let figure = document.createElement('figure')
     figure.setAttribute('style', 'position: relative;')
-    figure.id = 'projectFigure_' + project.id
+    figure.id = 'projectFigureEdit_' + project.id
     galleryList.appendChild(figure)
 
     let img = document.createElement('img');
@@ -111,8 +108,10 @@ function displayProjectDialog(project) {
             .then((res) => {
                 if (res.ok) {
                     //suppression de la figure correspondante
-                    let figureProjet = document.getElementById('projectFigure_' + project.id)
-                    galleryList.removeChild(figureProjet)
+                    let figureProjetEdit = document.getElementById('projectFigureEdit_' + project.id)
+                    galleryList.removeChild(figureProjetEdit)
+                    let figureProject = document.getElementById('project_' + project.id)
+                    gallery[0].removeChild(figureProject)
                     
                 }
                 else {
@@ -171,16 +170,9 @@ if (userConneted) {
         event.preventDefault()
         EditDialog.showModal();
 
-        // let galleryList = document.querySelectorAll('.gallery-edit')[0]
-        // galleryList.innerHTML = ""
-        
-
         projectsList.forEach(project => {
             displayProjectDialog(project)
-
-
         })
-
 
     })
 
