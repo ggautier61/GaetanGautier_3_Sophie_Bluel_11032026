@@ -13,28 +13,7 @@ let filterButtons;
 let projectsList;
 let projectsListFiltered;
 
-if (userConneted) {
-    let buttons = document.querySelectorAll('nav li a')
-    let editButton = document.querySelectorAll('#portfolio .editButton')[0]
 
-    buttons.forEach(btn => {
-        if (btn.textContent === "login") {
-            btn.textContent = "logout"
-        }
-    })
-
-    editButton.setAttribute('style', "display: flex;");
-
-    divFilterContainer.setAttribute('style', "display: none;");
-
-    editButton.addEventListener('click', function(event) {
-        event.preventDefault()
-
-        console.log('vous voulez modifier !!!')
-    })
-
-
-}
 
 
 
@@ -85,6 +64,118 @@ function deleteFilterSelected() {
 	})
 }
 
+function displayProjectDialog(project) {
+
+    let galleryList = document.querySelectorAll('#edit-dialogue .gallery-edit')[0]
+
+    let figure = document.createElement('figure')
+    figure.setAttribute('style', 'position: relative;')
+    galleryList.appendChild(figure)
+
+    let img = document.createElement('img');
+    img.setAttribute('src', project.imageUrl);
+    img.setAttribute('alt',"Image Projet");
+    img.setAttribute('style', 'position: relative;')
+    figure.appendChild(img)
+
+    let divDeleteButton = document.createElement('div')
+    divDeleteButton.setAttribute('style', 'width: 17px; height: 17px; padding: 3px; position: absolute; right: 5px; top: 6px; background-color: black; color: white; display: flex; justify-content: center; align-items: center;')
+    img.appendChild(divDeleteButton)
+
+    let deleteProjetButton = document.createElement('i')
+    deleteProjetButton.classList.add('fa-solid')
+    deleteProjetButton.classList.add('fa-trash-can')
+    deleteProjetButton.setAttribute('style', 'position: static;')
+    deleteProjetButton.id = "projet_" + project.id
+    divDeleteButton.appendChild(deleteProjetButton)
+    
+    figure.appendChild(divDeleteButton)
+
+    deleteProjetButton.addEventListener('click', function(event) {
+        event.preventDefault()
+
+        //suppresion du projet au clique du bouton deleteProjetButton
+        console.log('suppression du projet ' + project.id)
+    })
+
+}
+
+if (userConneted) {
+
+    let mainContainer = document.querySelectorAll('.main-container')[0]
+
+    let divEditMessage = document.createElement('div')
+    divEditMessage.setAttribute('style', "background-color: black; width: 100%; height: 59px; display: flex; justify-content: center; align-items: center;");
+
+    let divMessageEditText = document.createElement('p')
+    let icondivMessageEditText = document.createElement('i')
+    icondivMessageEditText.setAttribute('class', 'fa-regular fa-pen-to-square')
+    divMessageEditText.appendChild(icondivMessageEditText)
+
+    let divtextEdit = document.createElement('div')
+    divtextEdit.textContent = 'Mode édition'
+    divMessageEditText.appendChild(divtextEdit)
+
+    
+    divMessageEditText.setAttribute('style', 'color: white; display: flex; column-gap: 15px;')
+    divEditMessage.appendChild(divMessageEditText)
+
+    
+
+    mainContainer.before(divEditMessage)
+
+    let buttons = document.querySelectorAll('nav li a')
+    let EditDialog = document.querySelector('#edit-dialogue')
+    let showDialog = document.querySelector('#showDialog')
+
+
+    buttons.forEach(btn => {
+        if (btn.textContent === "login") {
+            btn.textContent = "logout"
+        }
+    })
+
+    //editButton.setAttribute('style', "display: flex;");
+
+    divFilterContainer.setAttribute('style', "display: none;");
+
+    showDialog.addEventListener('click', function(event) {
+        event.preventDefault()
+        EditDialog.showModal();
+
+        // let galleryList = document.querySelectorAll('.gallery-edit')[0]
+        // galleryList.innerHTML = ""
+        
+
+        projectsList.forEach(project => {
+            displayProjectDialog(project)
+
+
+        })
+
+
+    })
+
+    let dialog = document.getElementById('edit-dialogue')
+    dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+            dialog.close();
+        }
+    })
+
+    dialog.addEventListener('close', function() {
+        let galleryList = document.querySelectorAll('.gallery-edit')[0]
+        galleryList.innerHTML = ""
+    })
+
+    let closeButtonDialog = document.querySelectorAll('.fa-xmark')[0]
+
+    closeButtonDialog.addEventListener('click', function(event) {
+        EditDialog.close()
+    })
+
+
+}
 
 // Récupération de l'api
 fetch('http://localhost:5678/api/works')

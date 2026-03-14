@@ -44,14 +44,18 @@ q:before, q:after {
 }
 table {
 	border-collapse: collapse;
-	border-spacing: 0;
+	border-spacing: 0;	
 }
 /** end reset css**/
 body {
-	max-width: 1140px;
-	margin:auto;
+	/* max-width: 1140px;
+	margin:auto; */
 	font-family: 'Work Sans' ;
 	font-size: 14px;
+}
+.main-container {
+	max-width: 1140px;
+	margin: auto;
 }
 header {
 	display: flex;
@@ -111,6 +115,7 @@ nav li img {
 li:hover, li a:hover {
 	color: #B1663C;
 }
+
 #introduction {
 	display: flex;
 	align-items: center;
@@ -139,6 +144,29 @@ li:hover, li a:hover {
 	margin-bottom: 1em;
 }
 
+#portfolio dialog {
+	font-family: "Work Sans";
+	max-height: 688px;
+	height: 688px;
+	max-width: 630px;
+	width: 100%;
+	border: none;
+	border-radius: 10px;
+	/* display: flex;
+	flex-direction: column;
+	align-items: center; */
+	padding: 0;
+		padding-left: 105px;
+			padding-right: 105px;
+			box-sizing: border-box;
+}
+
+#portfolio dialog h3 {
+	font-size: 26px;
+	margin-top: 60px;
+	margin-bottom: 46px;
+}
+
 #portfolio .filterContainer {
 	display: flex;
 	justify-content: center;
@@ -150,7 +178,11 @@ li:hover, li a:hover {
 	position: absolute;
 	right: -120px;
 	top: 10px;
-	display: none;
+	/* display: none; */
+	font-family: "Work Sans";
+	font-size: 14px;
+	border: none;
+	background-color: transparent;
 }
 
 .editButton:hover {
@@ -188,6 +220,38 @@ li:hover, li a:hover {
 	grid-row-gap: 20px;
 }
 
+#edit-dialogue i {
+	position: absolute;
+	right: 30px;
+	top: 26px;
+}
+
+#edit-dialogue i:hover {
+	cursor: pointer;
+}
+
+
+.gallery-edit {
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-column-gap: 9px;
+	grid-row-gap: 29px;
+	grid-auto-rows: max-content;
+	/* overflow-y: auto; */
+	flex: 4;
+}
+
+.gallery-edit figure {
+	/* height: 102.5px;
+	width: 76px; */
+}
+
+.gallery-edit figure img {
+	width: 100%;
+	height: 100%;
+}
+
 .gallery img {
 	width: 100%;
 
@@ -210,7 +274,7 @@ margin: auto;
 	flex-direction: column;
 }
 
-#contact input, #login input {
+#contact input, #login input, #edit-dialogue button {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
@@ -224,7 +288,7 @@ margin: auto;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
-input[type="submit"]{
+input[type="submit"], #edit-dialogue button{
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
@@ -235,7 +299,17 @@ input[type="submit"]{
 	border-radius: 60px ;
 }
 
-input[type="submit"]:hover {
+#edit-dialogue button {
+	height: 36px;
+	font-size: 14px;
+	padding-left: 50px;
+	padding-right: 50px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	width: auto;
+}
+
+input[type="submit"]:hover, #edit-dialogue button:hover {
 	cursor: pointer;
 	background-color: #0E2F28;
 }
