@@ -12,6 +12,7 @@ let divFilterContainer = document.querySelectorAll('#portfolio .filterContainer'
 let filterButtons;
 let projectsList;
 let projectsListFiltered;
+let categories = []
 
 
 function displayProject(project) {
@@ -131,6 +132,7 @@ if (userConneted) {
 
     let mainContainer = document.querySelectorAll('.main-container')[0]
 
+    // Bandeau du haut mode edition
     let divEditMessage = document.createElement('div')
     divEditMessage.setAttribute('style', "background-color: black; width: 100%; height: 59px; display: flex; justify-content: center; align-items: center;");
 
@@ -142,8 +144,6 @@ if (userConneted) {
     let divtextEdit = document.createElement('div')
     divtextEdit.textContent = 'Mode édition'
     divMessageEditText.appendChild(divtextEdit)
-
-    
     divMessageEditText.setAttribute('style', 'color: white; display: flex; column-gap: 15px;')
     divEditMessage.appendChild(divMessageEditText)
 
@@ -151,6 +151,7 @@ if (userConneted) {
 
     mainContainer.before(divEditMessage)
 
+    // Changement de texte du bouton login pour logout
     let buttons = document.querySelectorAll('nav li a')
     let EditDialog = document.querySelector('#edit-dialogue')
     let showDialog = document.querySelector('#showDialog')
@@ -162,10 +163,11 @@ if (userConneted) {
         }
     })
 
-    //editButton.setAttribute('style', "display: flex;");
 
+    // Cache les Filtres catégorie
     divFilterContainer.setAttribute('style', "display: none;");
 
+    // Dialog + bouton showDialog
     showDialog.addEventListener('click', function(event) {
         event.preventDefault()
         EditDialog.showModal();
@@ -173,6 +175,8 @@ if (userConneted) {
         projectsList.forEach(project => {
             displayProjectDialog(project)
         })
+
+
 
     })
 
@@ -194,6 +198,201 @@ if (userConneted) {
         EditDialog.close()
     })
 
+    let galleryProjetsContainer = document.querySelectorAll('#edit-dialogue .editPageContainer')[0]
+    let projetForm = document.getElementById('projet-form')
+    let arrowLeftButton = document.querySelectorAll('#edit-dialog-entete-button .fa-arrow-left')[0]
+    // let closeButton = document.querySelectorAll('#edit-dialog-entete-button .fa-xmark')[0]
+    let dialogButton = document.getElementById('dialogButton')
+
+    dialogButton.addEventListener('click', function(event) {
+        event.preventDefault()
+
+        // Upload Pohot projet
+        const uploadBtn = document.getElementById("uploadBtn");
+        const imageInput = document.getElementById("imageInput");
+        const error = document.getElementById("error");
+
+        uploadBtn.addEventListener("click", () => {
+        imageInput.click();
+        });
+
+        imageInput.addEventListener("change", () => {
+            error.textContent = "";
+
+            const file = imageInput.files[0];
+            if (!file) return;
+
+            const maxSize = 4 * 1024 * 1024; // 4 MB
+            const allowedTypes = ["image/jpeg", "image/png"];
+
+            if (!allowedTypes.includes(file.type)) {
+                error.textContent = "Seules les images JPG et PNG sont autorisées.";
+                imageInput.value = "";
+                return;
+            }
+
+            if (file.size > maxSize) {
+                error.textContent = "La taille maximale est de 4 Mo.";
+                imageInput.value = "";
+                return;
+            }
+
+            let imageAddContainerDialog = document.querySelectorAll('.imageAddContainerDialog')[0]
+            imageAddContainerDialog.setAttribute('style', 'height: stretch; margin: 0; width: auto;')
+
+            let image = document.querySelectorAll('.imageAddContainerDialog img')[0]
+            image.src = `./assets/images/${file.name}`
+            image.setAttribute('style', 'height: 100%;')
+
+            let ajouterButtonContainerDialog = document.querySelectorAll('.ajouterButtonContainerDialog')[0]
+            ajouterButtonContainerDialog.setAttribute('style', 'display: none;')
+
+            console.log("Image valide :", file);
+            
+        });
+
+        switch (dialogButton.textContent) {
+            case "Ajouter une photo":
+                
+                galleryProjetsContainer.setAttribute('style', 'display: none;')
+                // closeButton.setAttribute('style', 'visibility: hidden;')
+                arrowLeftButton.setAttribute('style', 'visibility: unset;')
+                projetForm.setAttribute('style', 'display: flex; flex-direction: column; flex: 4')
+                let h3 = document.querySelectorAll('#edit-dialog_entete h3')[0]
+                console.log('h3', h3)
+                h3.textContent = "Ajout Photo"
+
+                dialogButton.textContent="Valider"
+
+                arrowLeftButton.addEventListener('click', function(event) {
+                    event.preventDefault()
+
+                    galleryProjetsContainer.setAttribute('style', '')
+                    arrowLeftButton.setAttribute('style', 'visibility: hidden;')
+                    //TODO: Vider le formulaire ????
+                    projetForm.setAttribute('style', 'display: none')
+                    h3.textContent = "Galerie photo"
+                    dialogButton.textContent="Ajouter une photo"
+
+                })
+
+                let categorySelect = document.querySelectorAll('#valid_form select')[0]
+                // categorySelect.selectedIndex = -1
+
+                categories.forEach((category) => {
+                    let option = document.createElement('option')
+                    option.value = category.id
+                    option.textContent = category.name
+                    categorySelect.appendChild(option)
+                })
+
+                break;
+        
+            case "Valider":
+                //Vérification de la validité des champs
+
+                // Si ok, post du nouveau projet
+
+                // Si pas ok, affichage message d'erreur
+
+                break;
+            default:
+                break;
+        }
+
+
+
+        
+    })
+
+
+}
+
+//  function showMessage() {
+//     messageBasket.setAttribute('style', "visibility: hidden;");
+//     if (basket) {
+//         basket.forEach(art => {
+//             if(art.id == id && art.option == selectOption.selectedIndex) {
+//                 messageBasket.setAttribute('style', "visibility: visible");
+//                 messageBasket.textContent = 'Vous avez ' + art.quantity + ' article(s) de ce modèle dans votre panier.'
+//             } 
+//         })
+//     }
+//  }
+
+function fetchCategories() {
+
+    fetch('http://localhost:5678/api/categories')
+    .then(response => response.json())
+    .then(cats => {
+        // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
+        categories = cats
+        
+        displayFilterAll()
+        
+        for(let i = 0; i < cats.length; i++){
+            
+            displayCategory(cats[i]); 
+        }
+
+        filterButtons = document.querySelectorAll('#portfolio .filterButton')
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault()
+
+                let id = button.id.split('_')[1]
+
+                if (parseInt(id) === 0) {
+                    projectsListFiltered = projectsList
+                }
+                else {
+                    projectsListFiltered = projectsList.filter(p => p.categoryId === parseInt(id))                
+                }
+
+                deleteFilterSelected()
+                button.classList.add('filterButtonSelected')
+                
+                //supression de toutes les figures avant d'en créer des nouvelles
+                gallery[0].querySelectorAll("figure").forEach(figure => figure.remove());
+
+                projectsListFiltered.forEach(project => displayProject(project))
+
+
+        })
+        })
+
+        
+ 
+    }).catch(error => console.log(error))
+
+}
+
+function checkValidityInput() {
+
+
+    if (!document.querySelector('#imageInput').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
+            alert('Le champs nom ne doit pas contenir de caractères spéciaux ou numériques');
+            return false;
+    } 
+    if (!document.querySelector('#firstname').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
+        alert('Le champs prénom ne doit pas contenir de caractères spéciaux ou numériques');
+        return false;
+    }
+    if (!document.querySelector('#email').value.match(/^[\w]+\@[\w]+\.[a-z]{2,3}$/)){
+        alert('L\'adresse email renseignée n\'est pas valide. Elle doit être sous la forme exemple@exemple.fr et ne pas contenir de caractères spéciaux');
+        return false;
+    }
+    if (!document.querySelector('#address').value.match(/^([\wàâäéèêëïîôöùûüç' ]+)$/)){
+        alert('Le champs Adresse ne doit pas contenir de caractères spéciaux ou numériques');
+        return false;
+    }
+    if (!document.querySelector('#city').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
+        alert('Le champs ville ne doit pas contenir de caractères spéciaux ou numériques');
+        return false;
+    }
+
+    return true;
 
 }
 
@@ -212,45 +411,8 @@ fetch('http://localhost:5678/api/works')
 }).catch(error => console.log(error))
 
 
-fetch('http://localhost:5678/api/categories')
-.then(response => response.json())
-.then(categories => {
-    // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
-    displayFilterAll()
-    
-    for(let i = 0; i < categories.length; i++){
-        
-        displayCategory(categories[i]);
-        
-    }
-    filterButtons = document.querySelectorAll('#portfolio .filterButton')
+fetchCategories()
 
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            event.preventDefault()
-
-            let id = button.id.split('_')[1]
-
-            if (parseInt(id) === 0) {
-                projectsListFiltered = projectsList
-            }
-            else {
-                projectsListFiltered = projectsList.filter(p => p.categoryId === parseInt(id))                
-            }
-
-            deleteFilterSelected()
-            button.classList.add('filterButtonSelected')
-            
-            //supression de toutes les figures avant d'en créer des nouvelles
-            gallery[0].querySelectorAll("figure").forEach(figure => figure.remove());
-
-            projectsListFiltered.forEach(project => displayProject(project))
-
-
-    })
-})
-
-}).catch(error => console.log(error))
 
 
 

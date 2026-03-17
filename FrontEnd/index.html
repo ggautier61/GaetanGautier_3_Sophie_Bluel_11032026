@@ -69,25 +69,84 @@
 						</button>
 
 						<dialog id="edit-dialogue">
-							<div
+							<div id="gallery-projets-container"
 								style="width: 100%; height:100%; display: flex; flex-direction: column; align-items: center;">
+								<div id="edit-dialog_entete"
+									style="display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box;">
+									<div id="edit-dialog-entete-button"
+										style="display: flex; justify-content: space-between; width: 100%;">
+										<div style="width: 24px; height: 24px;">
+											<i class="fa-solid fa-arrow-left" style="visibility: hidden;"></i>
+										</div>
+										<div
+											style="width: 24px; height: 24px; display: flex; justify-content: center; align-items: center;">
+											<i class="fa-solid fa-xmark fa-xl"></i>
+										</div>
+									</div>
+									<h3>Galerie photos</h3>
+								</div>
+
 
 								<!-- <div style="position: absolute; right: 30px; top: 26px;"> -->
-								<i class="fa-solid fa-xmark pointer"></i>
 								<!-- </div> -->
-								<h3>Galerie photos</h3>
 
-								<div class="gallery-edit">
+								<div class="editPageContainer"
+									style="display: flex; flex-direction: column; justify-content: center;">
+									<div class="gallery-edit"></div>
 
 
 
 								</div>
-								<div style="width: 100%; flex: 1;">
+
+
+								<!-- Container ajout projet -->
+								<div id="projet-form" style="display: none;">
+
+									<form id='valid_form' style="margin-top: 0; ">
+
+										<div
+											style="height: 169px; width: 420px; background-color: #E8F1F6; border-radius: 3px; display: flex; flex-direction: column; align-items: center;">
+
+											<div class="imageAddContainerDialog">
+												<img src="./assets/icons/Image.png" alt="Import Image">
+												<!-- <img src="./assets/images/la-balisiere.png" alt="Import Image"> -->
+
+											</div>
+
+											<div class="ajouterButtonContainerDialog">
+												<button type="button" id="uploadBtn" class="uploadPhotoButton">+ Ajouter
+													photo</button>
+												<p style="font-size: 10px;">jpg, png: 4mo max</p>
+											</div>
+											<input type="file" id="imageInput" accept=".jpg,.jpeg,.png"
+												style="display: none;" required>
+											<p id="error" style="color:red"></p>
+										</div>
+
+
+										<label for="titre" class="form-label">Titre</label>
+										<input type="text" class="form-control" id="titre" required>
+										<!-- <div class="invalid-feedback">
+												Veuillez entrer un nom correct
+											</div> -->
+										<label for="categoriesSelect" class="form-label">Catégorie</label>
+										<select id="categoriesSelect" required>
+											<option value="" disabled selected hidden></option>
+										</select>
+
+									</form>
+								</div>
+
+								<!-- Bouton Ajout/Validation -->
+								<div
+									style="width: 100%; flex: 1; padding-left: 105px; padding-right: 105px; box-sizing: border-box; margin-bottom: 55px;">
 									<hr />
 									<div style="display: flex; justify-content: center; align-items: center;">
-										<button>Ajouter une photo</button>
+										<button id="dialogButton">Ajouter une photo</button>
 									</div>
 								</div>
+							</div>
+
 						</dialog>
 
 

@@ -152,19 +152,21 @@ li:hover, li a:hover {
 	width: 100%;
 	border: none;
 	border-radius: 10px;
-	/* display: flex;
-	flex-direction: column;
-	align-items: center; */
+	/* display: flex; */
+	/* flex-direction: column; */
+	/* align-items: center; */
 	padding: 0;
-		padding-left: 105px;
-			padding-right: 105px;
-			box-sizing: border-box;
+	/*padding-left: 105px;
+	padding-right: 105px;
+	box-sizing: border-box; */
 }
 
 #portfolio dialog h3 {
 	font-size: 26px;
-	margin-top: 60px;
+	margin-top: 6px;
 	margin-bottom: 46px;
+	display: flex;
+	justify-content: center;
 }
 
 #portfolio .filterContainer {
@@ -220,14 +222,27 @@ li:hover, li a:hover {
 	grid-row-gap: 20px;
 }
 
-#edit-dialogue i {
+.editPageContainer {
+	padding-left: 105px;
+	padding-right: 105px;
+	box-sizing: border-box;
+	height: 560px;
+}
+
+/* #edit-dialogue i {
 	position: absolute;
 	right: 30px;
 	top: 26px;
-}
+} */
 
 #edit-dialogue i:hover {
 	cursor: pointer;
+}
+
+#edit-dialog_entete {
+	padding-left: 30px;
+	padding-right: 30px;
+	padding-top: 20px;
 }
 
 
@@ -267,25 +282,30 @@ margin: auto;
 #contact h2{
 	margin-bottom: 20px;
 }
-#contact form, #login form {
+#contact form, #login form, #projet-form form {
 	text-align: left;
 	margin-top:30px;
 	display: flex;
 	flex-direction: column;
 }
 
-#contact input, #login input, #edit-dialogue button {
+#contact input, #login input, #edit-dialogue button, 
+#projet-form input,
+#projet-form select {
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	padding-left: 16px;
+	padding-right: 16px;
 }
-#contact label, #login label {
+#contact label, #login label, #projet-form label {
 	margin: 2em 0 1em 0;
 }
 #contact textarea {
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+	padding: 16px;
 }
 
 input[type="submit"], #edit-dialogue button{
@@ -299,19 +319,50 @@ input[type="submit"], #edit-dialogue button{
 	border-radius: 60px ;
 }
 
+input[type="submit"]:hover, #edit-dialogue button:hover {
+	cursor: pointer;
+	background-color: #0E2F28;
+}
+
+/* .uploadPhotoButton {
+	padding-left: 33px;
+	padding-right: 33px;
+	font-size: 14px;
+	font-weight: 500;
+	font-style: medium;
+} */
+
 #edit-dialogue button {
 	height: 36px;
 	font-size: 14px;
+	font-weight: 500;
 	padding-left: 50px;
 	padding-right: 50px;
 	padding-top: 10px;
 	padding-bottom: 10px;
-	width: auto;
+	width: 237px;
+	margin-bottom: 0;
 }
 
-input[type="submit"]:hover, #edit-dialogue button:hover {
-	cursor: pointer;
-	background-color: #0E2F28;
+.imageAddContainerDialog {
+	height: 76px;
+	width: 76px;
+	margin-top: 22.5px;
+}
+
+.ajouterButtonContainerDialog {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.uploadPhotoButton {
+	background-color: #CBD6DC !important;
+	color: #306685 !important;
+	margin-top: 0 !important;
+	margin-bottom: 7px !important;
+	padding-left: 33px !important;
+	padding-right: 33px !important;
 }
 
 footer nav ul {
