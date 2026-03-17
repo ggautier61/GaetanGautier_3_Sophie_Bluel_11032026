@@ -14,6 +14,10 @@ let projectsList;
 let projectsListFiltered;
 let categories = []
 
+//TODO : Récupérer le token après login
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3Mzc1ODQzNCwiZXhwIjoxNzczODQ0ODM0fQ.2vr0W_tHtRBG7PwaBrpO5aq2UDjWomDGii6kH5Naxgw'
+        
+
 
 function displayProject(project) {
 
@@ -93,8 +97,6 @@ function displayProjectDialog(project) {
     deleteProjetButton.addEventListener('click', async function(event) {
         event.preventDefault()
 
-        //TODO : Récupérer le token après login
-        const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3MzQ4MzEyNywiZXhwIjoxNzczNTY5NTI3fQ.GQ4D0UV37iztYlAsXtBXz3qG6p6AMxkF1DOXWRnhpAY'
         
         
         //suppresion du projet au clique du bouton deleteProjetButton
@@ -204,54 +206,18 @@ if (userConneted) {
     // let closeButton = document.querySelectorAll('#edit-dialog-entete-button .fa-xmark')[0]
     let dialogButton = document.getElementById('dialogButton')
 
-    dialogButton.addEventListener('click', function(event) {
+    dialogButton.addEventListener('click', async function(event) {
         event.preventDefault()
 
         // Upload Pohot projet
         const uploadBtn = document.getElementById("uploadBtn");
-        const imageInput = document.getElementById("imageInput");
-        const error = document.getElementById("error");
-
-        uploadBtn.addEventListener("click", () => {
-        imageInput.click();
-        });
-
-        imageInput.addEventListener("change", () => {
-            error.textContent = "";
-
-            const file = imageInput.files[0];
-            if (!file) return;
-
-            const maxSize = 4 * 1024 * 1024; // 4 MB
-            const allowedTypes = ["image/jpeg", "image/png"];
-
-            if (!allowedTypes.includes(file.type)) {
-                error.textContent = "Seules les images JPG et PNG sont autorisées.";
-                imageInput.value = "";
-                return;
-            }
-
-            if (file.size > maxSize) {
-                error.textContent = "La taille maximale est de 4 Mo.";
-                imageInput.value = "";
-                return;
-            }
-
-            let imageAddContainerDialog = document.querySelectorAll('.imageAddContainerDialog')[0]
-            imageAddContainerDialog.setAttribute('style', 'height: stretch; margin: 0; width: auto;')
-
-            let image = document.querySelectorAll('.imageAddContainerDialog img')[0]
-            image.src = `./assets/images/${file.name}`
-            image.setAttribute('style', 'height: 100%;')
-
-            let ajouterButtonContainerDialog = document.querySelectorAll('.ajouterButtonContainerDialog')[0]
-            ajouterButtonContainerDialog.setAttribute('style', 'display: none;')
-
-            console.log("Image valide :", file);
-            
-        });
+        let imageInput = document.getElementById("imageInput");
+        // const error = document.getElementById("error");
+        let errorMessage = document.getElementById('error-message')
+        // let imageInput = document.getElementById('imageInput').value
 
         switch (dialogButton.textContent) {
+
             case "Ajouter une photo":
                 
                 galleryProjetsContainer.setAttribute('style', 'display: none;')
@@ -259,7 +225,6 @@ if (userConneted) {
                 arrowLeftButton.setAttribute('style', 'visibility: unset;')
                 projetForm.setAttribute('style', 'display: flex; flex-direction: column; flex: 4')
                 let h3 = document.querySelectorAll('#edit-dialog_entete h3')[0]
-                console.log('h3', h3)
                 h3.textContent = "Ajout Photo"
 
                 dialogButton.textContent="Valider"
@@ -286,14 +251,129 @@ if (userConneted) {
                     categorySelect.appendChild(option)
                 })
 
+                uploadBtn.addEventListener("click", () => {
+                    imageInput.click();
+                });
+
+                
+                imageInput.addEventListener("change", () => {
+                    console.log('passage dans imageInput.event')
+                    errorMessage.textContent = "";
+                    let file = imageInput.files[0]
+                    console.log('file', file)
+                    if (!file) return;
+
+                    const maxSize = 4 * 1024 * 1024; // 4 MB
+                    const allowedTypes = ["image/jpeg", "image/png"];
+
+                    if (!allowedTypes.includes(file.type)) {
+                        errorMessage.textContent = "Seules les images JPG et PNG sont autorisées.";
+                        imageInput.value = "";
+                        return;
+                    }
+
+                    if (file.size > maxSize) {
+                        errorMessage.textContent = "La taille maximale est de 4 Mo.";
+                        imageInput.value = "";
+                        return;
+                    }
+
+                    let imageAddContainerDialog = document.querySelectorAll('.imageAddContainerDialog')[0]
+                    imageAddContainerDialog.setAttribute('style', 'height: stretch; margin: 0; width: auto;')
+
+                    let image = document.querySelectorAll('.imageAddContainerDialog img')[0]
+                    image.src = `./assets/images/${file.name}`
+                    image.setAttribute('style', 'height: 100%;')
+
+                    let ajouterButtonContainerDialog = document.querySelectorAll('.ajouterButtonContainerDialog')[0]
+                    ajouterButtonContainerDialog.setAttribute('style', 'display: none;')
+                    
+                    return;
+                });
+
                 break;
         
             case "Valider":
-                //Vérification de la validité des champs
+                
+                errorMessage.textContent = ""
 
-                // Si ok, post du nouveau projet
+                //Vérification de la validité des champs
+                let titre = document.querySelector("#titre").value;
+                let category = document.getElementById('categoriesSelect').value
 
                 // Si pas ok, affichage message d'erreur
+                if (category === "") { 
+                    errorMessage.textContent = "Veuillez sélectionner une catégorie."
+                    break;
+                }
+                if (imageInput.value === "") { 
+                    errorMessage.textContent = "Veuillez sélectionner une photo."
+                    break;
+                }
+                if (!titre.match(/^([\wàâäéèêëïîôöùûüç'" -]+)$/)) { 
+                    errorMessage.textContent = 'Le titre ne doit pas comporté des caractères spéciaux ou être vide.'
+                    break;
+                }
+
+                // Si ok, post du nouveau projet
+              
+                    let file = imageInput.files[0]
+                    let projet = {
+                        title: titre,
+                        // imageUrl: file,
+                        categoryId : category
+                    }
+
+                    console.log('new project', projet)
+
+                    const formData = new FormData();
+                    formData.append("title", titre);
+                    formData.append("category", category); // ou l'id réel
+                    formData.append("image", file); // ⚠️ important
+
+                    await fetch("http://localhost:5678/api/works/", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": 'Bearer ' + token
+                        },
+                        body: formData,
+                    })
+                    .then((res) => {
+                        if (res.ok) {
+
+                            console.log('res post', res)
+
+                            
+                            // displayProjectDialog(project)
+
+                            alert("Le projet a été ajouté avec succés !")
+
+                            //Rafraichissement de la page/Vider les input
+                            document.querySelector("#titre").value = ""
+                            document.getElementById('categoriesSelect').value = ""
+                            imageInput.value = ""
+                            document.querySelectorAll('.imageAddContainerDialog img')[0].src = "./assets/icons/Image.png"
+                            document.querySelectorAll('.ajouterButtonContainerDialog')[0].setAttribute('style', 'display: inherit;')
+                            document.querySelectorAll('.imageAddContainerDialog')[0].removeAttribute('style')
+                            document.querySelectorAll('.imageAddContainerDialog img')[0].removeAttribute('style')
+                            document.getElementById('projet-form').setAttribute('style', 'display: none')
+                            document.querySelectorAll('.editPageContainer')[0].removeAttribute('style')
+                            dialogButton.textContent = "Ajouter une photo"
+
+                           
+                            
+                        }
+                        else {
+                            alert("Impossible d'ajouter le nouveau projet !")
+                            // console.log('projet ' + projet.id + " non supprimé")
+                        }
+                    }).catch(error => console.log(error));
+               
+
+                
+
+                //rafraichissement liste projet en édition
+                
 
                 break;
             default:
