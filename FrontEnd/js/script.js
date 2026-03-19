@@ -1,6 +1,5 @@
 let params = new URLSearchParams (document.location.href.split('?')[1]);
-let userConneted = params.get("connected");
-console.log('userConnected', userConneted)
+let userConneted = false;
 
 //Initialisation du container
 let gallery = document.querySelectorAll("#portfolio .gallery");
@@ -13,11 +12,21 @@ let filterButtons;
 let projectsList;
 let projectsListFiltered;
 let categories = []
+      
+function loadToken() {
+    token = JSON.parse(localStorage.getItem('bearer'));
+    if(token == null) {
+        token = "";
+    } else {
+        userConneted=true;
+    }
+}
 
-//TODO : Récupérer le token après login
-const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3Mzc1ODQzNCwiZXhwIjoxNzczODQ0ODM0fQ.2vr0W_tHtRBG7PwaBrpO5aq2UDjWomDGii6kH5Naxgw'
-        
+loadToken()
 
+function deleteToken() {
+    localStorage.removeItem('bearer')
+}
 
 function displayProject(project) {
 
@@ -97,8 +106,6 @@ function displayProjectDialog(project) {
     deleteProjetButton.addEventListener('click', async function(event) {
         event.preventDefault()
 
-        
-        
         //suppresion du projet au clique du bouton deleteProjetButton
         try {
             await fetch("http://localhost:5678/api/works/" + project.id, {
@@ -119,14 +126,27 @@ function displayProjectDialog(project) {
                 }
                 else {
                     alert('Impossible de supprimer le projet !')
-                    console.log('projet ' + project.id + " non supprimé")
                 }
             });
         } catch (error) {
             
         }
-        console.log('suppression du projet ' + project.id)
     })
+
+}
+
+function initFormDialog() {
+    document.querySelector("#titre").value = ""
+    document.getElementById('categoriesSelect').value = ""
+    imageInput.value = ""
+    document.querySelectorAll('.imageAddContainerDialog img')[0].src = "./assets/icons/Image.png"
+    document.querySelectorAll('.ajouterButtonContainerDialog')[0].setAttribute('style', 'display: inherit;')
+    document.querySelectorAll('.imageAddContainerDialog')[0].removeAttribute('style')
+    document.querySelectorAll('.imageAddContainerDialog img')[0].removeAttribute('style')
+    document.getElementById('projet-form').setAttribute('style', 'display: none')
+    document.querySelectorAll('.editPageContainer')[0].removeAttribute('style')
+    dialogButton.textContent = "Ajouter une photo"
+
 
 }
 
@@ -157,11 +177,23 @@ if (userConneted) {
     let buttons = document.querySelectorAll('nav li a')
     let EditDialog = document.querySelector('#edit-dialogue')
     let showDialog = document.querySelector('#showDialog')
+    //TODO A modifier (à créer en javascript)
+    showDialog.style = "display: flex;"
 
+    let logButton = document.getElementById('logButton')
 
     buttons.forEach(btn => {
         if (btn.textContent === "login") {
             btn.textContent = "logout"
+        }
+    })
+
+    logButton.addEventListener('click', function(event) {
+        event.preventDefault()
+        if (logButton.textContent = "logout") {
+            deleteToken()
+            //TODO : A la deconnexion de l'utilisateur, faut-il rediriger vers login.html ou rester su index.html ?
+            window.location = "./views/login.html";
         }
     })
 
@@ -173,12 +205,11 @@ if (userConneted) {
     showDialog.addEventListener('click', function(event) {
         event.preventDefault()
         EditDialog.showModal();
+        document.body.style.overflow = "hidden";
 
         projectsList.forEach(project => {
             displayProjectDialog(project)
         })
-
-
 
     })
 
@@ -192,18 +223,19 @@ if (userConneted) {
     dialog.addEventListener('close', function() {
         let galleryList = document.querySelectorAll('.gallery-edit')[0]
         galleryList.innerHTML = ""
+        initFormDialog()
     })
 
     let closeButtonDialog = document.querySelectorAll('.fa-xmark')[0]
 
     closeButtonDialog.addEventListener('click', function(event) {
         EditDialog.close()
+        document.body.style.overflow = "";
     })
 
     let galleryProjetsContainer = document.querySelectorAll('#edit-dialogue .editPageContainer')[0]
     let projetForm = document.getElementById('projet-form')
     let arrowLeftButton = document.querySelectorAll('#edit-dialog-entete-button .fa-arrow-left')[0]
-    // let closeButton = document.querySelectorAll('#edit-dialog-entete-button .fa-xmark')[0]
     let dialogButton = document.getElementById('dialogButton')
 
     dialogButton.addEventListener('click', async function(event) {
@@ -243,20 +275,24 @@ if (userConneted) {
 
                 let categorySelect = document.querySelectorAll('#valid_form select')[0]
                 // categorySelect.selectedIndex = -1
+                console.log('categorySelect', categorySelect.children)
 
-                categories.forEach((category) => {
-                    let option = document.createElement('option')
-                    option.value = category.id
-                    option.textContent = category.name
-                    categorySelect.appendChild(option)
-                })
+                if (categorySelect.children.length <= 1) {
+                    categories.forEach((category) => {
+                        let option = document.createElement('option')
+                        option.value = category.id
+                        option.textContent = category.name
+                        categorySelect.appendChild(option)
+                    })
+                }
 
                 uploadBtn.addEventListener("click", () => {
                     imageInput.click();
                 });
 
                 
-                imageInput.addEventListener("change", () => {
+                imageInput.addEventListener("change", function(event) {
+                    event.preventDefault()
                     console.log('passage dans imageInput.event')
                     errorMessage.textContent = "";
                     let file = imageInput.files[0]
@@ -317,63 +353,47 @@ if (userConneted) {
 
                 // Si ok, post du nouveau projet
               
-                    let file = imageInput.files[0]
-                    let projet = {
-                        title: titre,
-                        // imageUrl: file,
-                        categoryId : category
+                let file = imageInput.files[0]
+                let projet = {
+                    title: titre,
+                    // imageUrl: file,
+                    categoryId : category
+                }
+
+                console.log('new project', projet)
+
+                const formData = new FormData();
+                formData.append("title", titre);
+                formData.append("category", category); // ou l'id réel
+                formData.append("image", file); // ⚠️ important
+
+                fetch("http://localhost:5678/api/works/", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": 'Bearer ' + token
+                    },
+                    body: formData,
+                })
+                .then(res => res.json())
+                .then((data) => {
+                    if (data) {
+
+                        //Rafraichissement nouvelle image dans le dialog + portfolio
+                        displayProjectDialog(data)
+                        displayProject(data)
+
+                        //Vider les input
+                        initFormDialog()
+
+                        imageInput.removeEventListener('change')
+
+                        alert("Le projet a été ajouté avec succés !")
+                        
                     }
-
-                    console.log('new project', projet)
-
-                    const formData = new FormData();
-                    formData.append("title", titre);
-                    formData.append("category", category); // ou l'id réel
-                    formData.append("image", file); // ⚠️ important
-
-                    await fetch("http://localhost:5678/api/works/", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": 'Bearer ' + token
-                        },
-                        body: formData,
-                    })
-                    .then((res) => {
-                        if (res.ok) {
-
-                            console.log('res post', res)
-
-                            
-                            // displayProjectDialog(project)
-
-                            alert("Le projet a été ajouté avec succés !")
-
-                            //Rafraichissement de la page/Vider les input
-                            document.querySelector("#titre").value = ""
-                            document.getElementById('categoriesSelect').value = ""
-                            imageInput.value = ""
-                            document.querySelectorAll('.imageAddContainerDialog img')[0].src = "./assets/icons/Image.png"
-                            document.querySelectorAll('.ajouterButtonContainerDialog')[0].setAttribute('style', 'display: inherit;')
-                            document.querySelectorAll('.imageAddContainerDialog')[0].removeAttribute('style')
-                            document.querySelectorAll('.imageAddContainerDialog img')[0].removeAttribute('style')
-                            document.getElementById('projet-form').setAttribute('style', 'display: none')
-                            document.querySelectorAll('.editPageContainer')[0].removeAttribute('style')
-                            dialogButton.textContent = "Ajouter une photo"
-
-                           
-                            
-                        }
-                        else {
-                            alert("Impossible d'ajouter le nouveau projet !")
-                            // console.log('projet ' + projet.id + " non supprimé")
-                        }
-                    }).catch(error => console.log(error));
-               
-
-                
-
-                //rafraichissement liste projet en édition
-                
+                    else {
+                        alert("Impossible d'ajouter le nouveau projet !")
+                    }
+                }).catch(error => console.log(error));                
 
                 break;
             default:
@@ -384,7 +404,6 @@ if (userConneted) {
 
         
     })
-
 
 }
 
@@ -492,6 +511,7 @@ fetch('http://localhost:5678/api/works')
 
 
 fetchCategories()
+
 
 
 

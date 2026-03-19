@@ -12,45 +12,50 @@
     <meta name="description" content="">
     <link rel="stylesheet" href="../assets/style.css">
     <link rel="stylesheet" href="../css/login.css">
+    <script src="../js/login.js" defer></script>
 </head>
 
 <body>
-    <header>
-        <h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
-        <nav>
-            <ul>
-                <li><a href="../index.html#portfolio">projets</a></li>
-                <li><a href="../index.html#contact">contact</a></li>
-                <li><a id="loginlink" href="../views/login.html">login</a></li>
-                <li><img src="../assets/icons/instagram.png" alt="Instagram"></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
+    <div class="main-container">
+        <header>
+            <h1>Sophie Bluel <span>Architecte d'intérieur</span></h1>
+            <nav>
+                <ul>
+                    <li><a href="../index.html#portfolio">projets</a></li>
+                    <li><a href="../index.html#contact">contact</a></li>
+                    <li><a id="loginlink" href="../views/login.html">login</a></li>
+                    <li><img src="../assets/icons/instagram.png" alt="Instagram"></li>
+                </ul>
+            </nav>
+        </header>
+        <main>
 
-        <section id="login">
-            <h2>Log in</h2>
-            <form id="loginForm">
-                <p id="error-message"></p>
-                <label for="email">E-mail</label>
-                <input type="email" name="email" id="email">
-                <label for="name">Mot de passe</label>
-                <input type="password" name="password" id="password">
-                <input id="buttonSubmitLogin" type="submit" value="Se connecter">
-            </form>
-            <p class="passwordForgotten">Mot de passe oublié</p>
-        </section>
-    </main>
+            <section id="login">
+                <h2>Log in</h2>
+                <form id="loginForm">
+                    <p id="error-message"></p>
+                    <label for="email">E-mail</label>
+                    <input type="email" name="email" id="email">
+                    <label for="name">Mot de passe</label>
+                    <input type="password" name="password" id="password">
+                    <input id="buttonSubmitLogin" type="submit" value="Se connecter">
+                </form>
+                <p class="passwordForgotten">Mot de passe oublié</p>
+            </section>
+        </main>
 
-    <footer>
-        <nav>
-            <ul>
-                <li>Mentions Légales</li>
-            </ul>
-        </nav>
-    </footer>
+        <footer>
+            <nav>
+                <ul>
+                    <li>Mentions Légales</li>
+                </ul>
+            </nav>
+        </footer>
 
-    <script src="../js/login.js" defer></script>
+    </div>
+
+
+
 </body>
 
 </html>
