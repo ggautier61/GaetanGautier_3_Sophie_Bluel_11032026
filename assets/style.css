@@ -48,8 +48,6 @@ table {
 }
 /** end reset css**/
 body {
-	/* max-width: 1140px;
-	margin:auto; */
 	font-family: 'Work Sans' ;
 	font-size: 14px;
 }
@@ -139,9 +137,20 @@ li:hover, li a:hover {
 #introduction p {
 	margin-bottom: 0.5em;
 }
+
+.portFolioTitreContainer {
+	position: relative;
+	display: flex;
+	justify-content: center;
+}
+
 #portfolio h2 {
 	text-align: center;
 	margin-bottom: 1em;
+}
+
+#portfolio button i {
+	margin-right: 10px;
 }
 
 #portfolio dialog {
@@ -157,7 +166,6 @@ li:hover, li a:hover {
 
 dialog::backdrop {
 	background: rgba(0, 0, 0, 0.7);
-	/* assombrit */
 }
 
 #portfolio dialog h3 {
@@ -221,18 +229,23 @@ dialog::backdrop {
 	grid-row-gap: 20px;
 }
 
+dialog .galleryProjetsContainer {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 .editPageContainer {
 	padding-left: 105px;
 	padding-right: 105px;
 	box-sizing: border-box;
 	height: 560px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
-
-/* #edit-dialogue i {
-	position: absolute;
-	right: 30px;
-	top: 26px;
-} */
 
 #edit-dialogue i:hover {
 	cursor: pointer;
@@ -252,13 +265,7 @@ dialog::backdrop {
 	grid-column-gap: 9px;
 	grid-row-gap: 29px;
 	grid-auto-rows: max-content;
-	/* overflow-y: auto; */
 	flex: 4;
-}
-
-.gallery-edit figure {
-	/* height: 102.5px;
-	width: 76px; */
 }
 
 .gallery-edit figure img {
@@ -322,14 +329,6 @@ input[type="submit"]:hover, #edit-dialogue button:hover {
 	cursor: pointer;
 	background-color: #0E2F28;
 }
-
-/* .uploadPhotoButton {
-	padding-left: 33px;
-	padding-right: 33px;
-	font-size: 14px;
-	font-weight: 500;
-	font-style: medium;
-} */
 
 #edit-dialogue button {
 	height: 36px;

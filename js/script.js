@@ -6,8 +6,6 @@ let gallery = document.querySelectorAll("#portfolio .gallery");
 let portfolio = document.querySelector('#portfolio')
 let h2Filter = document.querySelector('#portfolio h2')
 let divFilterContainer = document.querySelectorAll('#portfolio .filterContainer')[0]
-// let divFilterContainer = document.createElement("div");
-// divFilterContainer.classList.add('filterContainer')
 let filterButtons;
 let projectsList;
 let projectsListFiltered;
@@ -168,9 +166,6 @@ if (userConneted) {
     divMessageEditText.appendChild(divtextEdit)
     divMessageEditText.setAttribute('style', 'color: white; display: flex; column-gap: 15px;')
     divEditMessage.appendChild(divMessageEditText)
-
-    
-
     mainContainer.before(divEditMessage)
 
     // Changement de texte du bouton login pour logout
@@ -197,7 +192,6 @@ if (userConneted) {
         }
     })
 
-
     // Cache les Filtres catégorie
     divFilterContainer.setAttribute('style', "display: none;");
 
@@ -206,11 +200,10 @@ if (userConneted) {
         event.preventDefault()
         EditDialog.showModal();
         document.body.style.overflow = "hidden";
-
+        
         projectsList.forEach(project => {
             displayProjectDialog(project)
         })
-
     })
 
     let dialog = document.getElementById('edit-dialogue')
@@ -241,19 +234,16 @@ if (userConneted) {
     dialogButton.addEventListener('click', async function(event) {
         event.preventDefault()
 
-        // Upload Pohot projet
+        // Upload Photo projet
         const uploadBtn = document.getElementById("uploadBtn");
         let imageInput = document.getElementById("imageInput");
-        // const error = document.getElementById("error");
         let errorMessage = document.getElementById('error-message')
-        // let imageInput = document.getElementById('imageInput').value
 
         switch (dialogButton.textContent) {
 
             case "Ajouter une photo":
                 
                 galleryProjetsContainer.setAttribute('style', 'display: none;')
-                // closeButton.setAttribute('style', 'visibility: hidden;')
                 arrowLeftButton.setAttribute('style', 'visibility: unset;')
                 projetForm.setAttribute('style', 'display: flex; flex-direction: column; flex: 4')
                 let h3 = document.querySelectorAll('#edit-dialog_entete h3')[0]
@@ -274,8 +264,6 @@ if (userConneted) {
                 })
 
                 let categorySelect = document.querySelectorAll('#valid_form select')[0]
-                // categorySelect.selectedIndex = -1
-                console.log('categorySelect', categorySelect.children)
 
                 if (categorySelect.children.length <= 1) {
                     categories.forEach((category) => {
@@ -293,13 +281,12 @@ if (userConneted) {
                 
                 imageInput.addEventListener("change", function(event) {
                     event.preventDefault()
-                    console.log('passage dans imageInput.event')
+
                     errorMessage.textContent = "";
                     let file = imageInput.files[0]
-                    console.log('file', file)
                     if (!file) return;
 
-                    const maxSize = 4 * 1024 * 1024; // 4 MB
+                    const maxSize = 4 * 1024 * 1024; //4mo
                     const allowedTypes = ["image/jpeg", "image/png"];
 
                     if (!allowedTypes.includes(file.type)) {
@@ -338,25 +325,23 @@ if (userConneted) {
                 let category = document.getElementById('categoriesSelect').value
 
                 // Si pas ok, affichage message d'erreur
-                if (category === "") { 
-                    errorMessage.textContent = "Veuillez sélectionner une catégorie."
-                    break;
-                }
                 if (imageInput.value === "") { 
                     errorMessage.textContent = "Veuillez sélectionner une photo."
                     break;
                 }
-                if (!titre.match(/^([\wàâäéèêëïîôöùûüç'" -]+)$/)) { 
-                    errorMessage.textContent = 'Le titre ne doit pas comporté des caractères spéciaux ou être vide.'
+                if (!titre.match(/^([\wàâäéèêëïîôöùûüç'" -~]+)$/)) { 
+                    errorMessage.textContent = 'Le titre ne doit pas être vide ou comporter des caractères spéciaux'
+                    break;
+                }
+                if (category === "") { 
+                    errorMessage.textContent = "Veuillez sélectionner une catégorie."
                     break;
                 }
 
                 // Si ok, post du nouveau projet
-              
                 let file = imageInput.files[0]
                 let projet = {
                     title: titre,
-                    // imageUrl: file,
                     categoryId : category
                 }
 
@@ -364,8 +349,8 @@ if (userConneted) {
 
                 const formData = new FormData();
                 formData.append("title", titre);
-                formData.append("category", category); // ou l'id réel
-                formData.append("image", file); // ⚠️ important
+                formData.append("category", category);
+                formData.append("image", file);
 
                 fetch("http://localhost:5678/api/works/", {
                     method: "POST",
@@ -399,72 +384,7 @@ if (userConneted) {
             default:
                 break;
         }
-
-
-
-        
     })
-
-}
-
-//  function showMessage() {
-//     messageBasket.setAttribute('style', "visibility: hidden;");
-//     if (basket) {
-//         basket.forEach(art => {
-//             if(art.id == id && art.option == selectOption.selectedIndex) {
-//                 messageBasket.setAttribute('style', "visibility: visible");
-//                 messageBasket.textContent = 'Vous avez ' + art.quantity + ' article(s) de ce modèle dans votre panier.'
-//             } 
-//         })
-//     }
-//  }
-
-function fetchCategories() {
-
-    fetch('http://localhost:5678/api/categories')
-    .then(response => response.json())
-    .then(cats => {
-        // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
-        categories = cats
-        
-        displayFilterAll()
-        
-        for(let i = 0; i < cats.length; i++){
-            
-            displayCategory(cats[i]); 
-        }
-
-        filterButtons = document.querySelectorAll('#portfolio .filterButton')
-
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault()
-
-                let id = button.id.split('_')[1]
-
-                if (parseInt(id) === 0) {
-                    projectsListFiltered = projectsList
-                }
-                else {
-                    projectsListFiltered = projectsList.filter(p => p.categoryId === parseInt(id))                
-                }
-
-                deleteFilterSelected()
-                button.classList.add('filterButtonSelected')
-                
-                //supression de toutes les figures avant d'en créer des nouvelles
-                gallery[0].querySelectorAll("figure").forEach(figure => figure.remove());
-
-                projectsListFiltered.forEach(project => displayProject(project))
-
-
-        })
-        })
-
-        
- 
-    }).catch(error => console.log(error))
-
 }
 
 function checkValidityInput() {
@@ -509,10 +429,4 @@ fetch('http://localhost:5678/api/works')
     }
 }).catch(error => console.log(error))
 
-
 fetchCategories()
-
-
-
-
-

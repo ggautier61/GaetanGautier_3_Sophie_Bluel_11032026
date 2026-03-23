@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
 		integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
 		crossorigin="anonymous" referrerpolicy="no-referrer" />
-	<meta name="description" content="">
+	<meta name="description" content="Site internet des projets de Sophie Bluel">
 	<link rel="stylesheet" href="./assets/style.css">
 	<script src="./js/script.js" defer></script>
 
@@ -49,28 +49,26 @@
 						décorateur(trice)</p>
 				</article>
 			</section>
+
 			<section id="portfolio">
 				<div style="display: flex; justify-content: center;">
-					<div style="position: relative;">
+					<div class="portFolioTitreContainer">
 						<h2>Mes Projets</h2>
-						<!-- <div class="editButton">
-							<i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i>
-							modifiers
-						</div> -->
+
 						<button command="show-modal" commandfor="edit-dialogue" id="showDialog" class="editButton">
-							<i class="fa-regular fa-pen-to-square" style="margin-right: 10px;"></i>
+							<i class="fa-regular fa-pen-to-square"></i>
 							modifier
 						</button>
 
 						<dialog id="edit-dialogue">
-							<div id="gallery-projets-container"
-								style="width: 100%; height:100%; display: flex; flex-direction: column; align-items: center;">
+							<div class="galleryProjetsContainer">
 								<div id="edit-dialog_entete"
 									style="display: flex; flex-direction: column; justify-content: center; width: 100%; box-sizing: border-box;">
 									<div id="edit-dialog-entete-button"
 										style="display: flex; justify-content: space-between; width: 100%;">
-										<div style="width: 24px; height: 24px;">
-											<i class="fa-solid fa-arrow-left" style="visibility: hidden;"></i>
+										<div
+											style="width: 24px; height: 24px; display: flex; justify-content: center; align-items: center;">
+											<i class="fa-solid fa-arrow-left fa-xl" style="visibility: hidden;"></i>
 										</div>
 										<div
 											style="width: 24px; height: 24px; display: flex; justify-content: center; align-items: center;">
@@ -80,16 +78,8 @@
 									<h3>Galerie photos</h3>
 								</div>
 
-
-								<!-- <div style="position: absolute; right: 30px; top: 26px;"> -->
-								<!-- </div> -->
-
-								<div class="editPageContainer"
-									style="display: flex; flex-direction: column; justify-content: center;">
+								<div class="editPageContainer">
 									<div class="gallery-edit"></div>
-
-
-
 								</div>
 
 
@@ -107,8 +97,6 @@
 
 											<div class="imageAddContainerDialog">
 												<img src="./assets/icons/Image.png" alt="Import Image">
-												<!-- <img src="./assets/images/la-balisiere.png" alt="Import Image"> -->
-
 											</div>
 
 											<div class="ajouterButtonContainerDialog">
@@ -118,14 +106,10 @@
 											</div>
 											<input type="file" id="imageInput" accept=".jpg,.jpeg,.png"
 												style="display: none;" required>
-											<!-- <p id="error" style="color:red"></p> -->
 										</div>
 
 										<label for="titre" class="form-label">Titre</label>
 										<input type="text" class="form-control" id="titre" required>
-										<!-- <div class="invalid-feedback">
-												Veuillez entrer un nom correct
-											</div> -->
 										<label for="categoriesSelect" class="form-label">Catégorie</label>
 										<select id="categoriesSelect" required>
 											<option value="" disabled selected hidden></option>
