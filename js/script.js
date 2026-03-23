@@ -387,6 +387,54 @@ if (userConneted) {
     })
 }
 
+function fetchCategories() {
+
+    fetch('http://localhost:5678/api/categories')
+    .then(response => response.json())
+    .then(cats => {
+        // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
+        categories = cats
+
+        displayFilterAll()
+
+        for(let i = 0; i < cats.length; i++){
+
+            displayCategory(cats[i]); 
+        }
+
+        filterButtons = document.querySelectorAll('#portfolio .filterButton')
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault()
+
+                let id = button.id.split('_')[1]
+
+                if (parseInt(id) === 0) {
+                    projectsListFiltered = projectsList
+                }
+                else {
+                    projectsListFiltered = projectsList.filter(p => p.categoryId === parseInt(id))                
+                }
+
+                deleteFilterSelected()
+                button.classList.add('filterButtonSelected')
+
+                //supression de toutes les figures avant d'en créer des nouvelles
+                gallery[0].querySelectorAll("figure").forEach(figure => figure.remove());
+
+                projectsListFiltered.forEach(project => displayProject(project))
+
+
+        })
+        })
+
+
+
+    }).catch(error => console.log(error))
+
+}
+
 function checkValidityInput() {
 
 

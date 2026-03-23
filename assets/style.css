@@ -255,8 +255,49 @@ dialog .galleryProjetsContainer {
 	padding-left: 30px;
 	padding-right: 30px;
 	padding-top: 20px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 100%;
+	box-sizing: border-box;
 }
 
+#edit-dialog-entete-button {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.buttonContainer {
+	width: 24px;
+	height: 24px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#edit-dialog-entete-button .buttonContainer .fa-arrow-left {
+	visibility: hidden;
+}
+
+#projet-form {
+	display: none;
+}
+
+#valid-form {
+	margin-top: 0;
+	width: 420px;
+}
+
+.imageFormDialog {
+	height: 169px;
+	width: 420px;
+	background-color: #E8F1F6;
+	border-radius: 3px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
 
 .gallery-edit {
 	width: 100%;
@@ -354,6 +395,10 @@ input[type="submit"]:hover, #edit-dialogue button:hover {
 	align-items: center;
 }
 
+.ajouterButtonContainerDialog p {
+	font-size: 10px;
+}
+
 .uploadPhotoButton {
 	background-color: #CBD6DC !important;
 	color: #306685 !important;
@@ -361,6 +406,19 @@ input[type="submit"]:hover, #edit-dialogue button:hover {
 	margin-bottom: 7px !important;
 	padding-left: 33px !important;
 	padding-right: 33px !important;
+}
+
+.buttonActionDialogContainer {
+	width: 100%;
+	padding-left: 105px;
+	padding-right: 105px;
+	box-sizing: border-box;
+	margin-bottom: 55px;
+}
+
+.buttonActionDialogContainer .buttonContainer {
+	width: auto;
+	height: auto;
 }
 
 footer nav ul {
