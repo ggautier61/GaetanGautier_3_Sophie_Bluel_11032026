@@ -1,480 +1,345 @@
-let params = new URLSearchParams (document.location.href.split('?')[1]);
-let userConneted = false;
+//<DOCUMENT filename="script.js">
+let token = "";
+let userConnected = false;
 
-//Initialisation du container
-let gallery = document.querySelectorAll("#portfolio .gallery");
-let portfolio = document.querySelector('#portfolio')
-let h2Filter = document.querySelector('#portfolio h2')
-let divFilterContainer = document.querySelectorAll('#portfolio .filterContainer')[0]
-let filterButtons;
-let projectsList;
-let projectsListFiltered;
-let categories = []
-      
+let projectsList = [];
+let categories = [];
+let gallery;
+
+// ====================== FONCTIONS D'AFFICHAGE ======================
 function loadToken() {
-    token = JSON.parse(localStorage.getItem('bearer'));
-    if(token == null) {
-        token = "";
-    } else {
-        userConneted=true;
-    }
+    const stored = localStorage.getItem('bearer');
+    token = stored ? JSON.parse(stored) : "";
+    userConnected = !!token;
 }
 
-loadToken()
-
 function deleteToken() {
-    localStorage.removeItem('bearer')
+    localStorage.removeItem('bearer');
 }
 
 function displayProject(project) {
+    const figure = document.createElement("figure");
+    figure.id = `project_${project.id}`;
+    gallery.appendChild(figure);
 
-    //Ajout de la Card
-    let figure = document.createElement("figure");
-    figure.id = "project_" + project.id
-    gallery[0].appendChild(figure);
+    const img = document.createElement("img");
+    img.src = project.imageUrl;
+    img.alt = "Image Projet";
+    figure.appendChild(img);
 
-    let divImg = document.createElement("img");
-    divImg.setAttribute('src', project.imageUrl);
-    divImg.setAttribute('alt',"Image Projet");
-    figure.appendChild(divImg)
-
-    //Ajout titre
-    let figcaption = document.createElement("figcaption");
+    const figcaption = document.createElement("figcaption");
     figcaption.textContent = project.title;
     figure.appendChild(figcaption);
-
 }
 
 function displayFilterAll() {
-
-    let divFilterAll = document.createElement('div')
-    divFilterAll.textContent = 'Tous'
-    divFilterAll.id = 'filterButton_' + 0
-    divFilterAll.classList.add('filterButton')
-    divFilterAll.classList.add('filterButtonSelected')
-    divFilterContainer.appendChild(divFilterAll)
+    const div = document.createElement('div');
+    div.textContent = 'Tous';
+    div.id = 'filterButton_0';
+    div.classList.add('filterButton', 'filterButtonSelected');
+    document.querySelector('#portfolio .filterContainer').appendChild(div);
 }
 
 function displayCategory(category) {
-
-    let divCategory = document.createElement('div')
-    divCategory.id = 'filterButton_' + category.id
-    divCategory.textContent = category.name
-    divCategory.classList.add('filterButton')
-    divFilterContainer.appendChild(divCategory)
-
+    const div = document.createElement('div');
+    div.id = `filterButton_${category.id}`;
+    div.textContent = category.name;
+    div.classList.add('filterButton');
+    document.querySelector('#portfolio .filterContainer').appendChild(div);
 }
 
 function deleteFilterSelected() {
-    let buttonsSelected = document.querySelectorAll('.filterButtonSelected')
-	
-	buttonsSelected.forEach((button) => {
-		button.classList.remove('filterButtonSelected')
-	})
+    document.querySelectorAll('.filterButtonSelected').forEach(btn => btn.classList.remove('filterButtonSelected'));
 }
 
-function displayProjectDialog(project) {
+function displayProjectDialog(project, galleryEdit) {
+    const figure = document.createElement('figure');
+    figure.style.position = 'relative';
+    figure.id = `projectFigureEdit_${project.id}`;
+    galleryEdit.appendChild(figure);
 
-    let galleryList = document.querySelectorAll('#edit-dialogue .gallery-edit')[0]
+    const img = document.createElement('img');
+    img.src = project.imageUrl;
+    img.alt = "Image Projet";
+    img.style.position = 'relative';
+    figure.appendChild(img);
 
-    let figure = document.createElement('figure')
-    figure.setAttribute('style', 'position: relative;')
-    figure.id = 'projectFigureEdit_' + project.id
-    galleryList.appendChild(figure)
+    // Bouton delete (positionné en absolute)
+    const deleteContainer = document.createElement('div');
+    deleteContainer.style.cssText = 'width: 17px; height: 17px; padding: 3px; position: absolute; right: 5px; top: 6px; background-color: black; color: white; display: flex; justify-content: center; align-items: center;';
+    figure.appendChild(deleteContainer);
 
-    let img = document.createElement('img');
-    img.setAttribute('src', project.imageUrl);
-    img.setAttribute('alt',"Image Projet");
-    img.setAttribute('style', 'position: relative;')
-    figure.appendChild(img)
+    const deleteIcon = document.createElement('i');
+    deleteIcon.classList.add('fa-solid', 'fa-trash-can');
+    deleteContainer.appendChild(deleteIcon);
 
-    let divDeleteButton = document.createElement('div')
-    divDeleteButton.setAttribute('style', 'width: 17px; height: 17px; padding: 3px; position: absolute; right: 5px; top: 6px; background-color: black; color: white; display: flex; justify-content: center; align-items: center;')
-    img.appendChild(divDeleteButton)
-
-    let deleteProjetButton = document.createElement('i')
-    deleteProjetButton.classList.add('fa-solid')
-    deleteProjetButton.classList.add('fa-trash-can')
-    deleteProjetButton.setAttribute('style', 'position: static;')
-    deleteProjetButton.id = "projetDeleteButton_" + project.id
-    divDeleteButton.appendChild(deleteProjetButton)
-    
-    figure.appendChild(divDeleteButton)
-
-    deleteProjetButton.addEventListener('click', async function(event) {
-        event.preventDefault()
-
-        //suppresion du projet au clique du bouton deleteProjetButton
+    // Suppression
+    deleteIcon.addEventListener('click', async (event) => {
+        event.preventDefault();
         try {
-            await fetch("http://localhost:5678/api/works/" + project.id, {
+            const res = await fetch(`http://localhost:5678/api/works/${project.id}`, {
                 method: "DELETE",
                 headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": 'Bearer ' + token
-                }
-            })
-            .then((res) => {
-                if (res.ok) {
-                    //suppression de la figure correspondante
-                    let figureProjetEdit = document.getElementById('projectFigureEdit_' + project.id)
-                    galleryList.removeChild(figureProjetEdit)
-                    let figureProject = document.getElementById('project_' + project.id)
-                    gallery[0].removeChild(figureProject)
-                    
-                }
-                else {
-                    alert('Impossible de supprimer le projet !')
+                    "Authorization": `Bearer ${token}`
                 }
             });
-        } catch (error) {
-            
-        }
-    })
 
+            if (res.ok) {
+                document.getElementById(`projectFigureEdit_${project.id}`)?.remove();
+                document.getElementById(`project_${project.id}`)?.remove();
+            } else {
+                alert('Impossible de supprimer le projet !');
+            }
+        } catch (e) {}
+    });
 }
+
+// ====================== GESTION DU DIALOGUE (nettoyée) ======================
+let currentObjectUrl = null;
+
+const maxSize = 4 * 1024 * 1024;
+const allowedTypes = ["image/jpeg", "image/png"];
 
 function initFormDialog() {
-    document.querySelector("#titre").value = ""
-    document.getElementById('categoriesSelect').value = ""
-    imageInput.value = ""
-    document.querySelectorAll('.imageAddContainerDialog img')[0].src = "./assets/icons/Image.png"
-    document.querySelectorAll('.ajouterButtonContainerDialog')[0].setAttribute('style', 'display: inherit;')
-    document.querySelectorAll('.imageAddContainerDialog')[0].removeAttribute('style')
-    document.querySelectorAll('.imageAddContainerDialog img')[0].removeAttribute('style')
-    document.getElementById('projet-form').setAttribute('style', 'display: none')
-    document.querySelectorAll('.editPageContainer')[0].removeAttribute('style')
-    dialogButton.textContent = "Ajouter une photo"
+    if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = null;
+    }
 
+    document.getElementById("titre").value = "";
+    document.getElementById('categoriesSelect').value = "";
+    document.getElementById("imageInput").value = "";
 
+    const previewImg = document.querySelector('.imageAddContainerDialog img');
+    previewImg.src = "./assets/icons/Image.png";
+    previewImg.style.cssText = '';
+
+    document.querySelector('.ajouterButtonContainerDialog').style.display = 'flex';
+    document.querySelector('.imageAddContainerDialog').style.cssText = '';
+    document.getElementById('projet-form').style.display = 'none';
+    document.querySelector('.editPageContainer').style.display = '';
+    document.getElementById('dialogButton').textContent = "Ajouter une photo";
 }
 
-if (userConneted) {
+function switchToAddMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton) {
+    galleryProjetsContainer.style.display = 'none';
+    arrowLeftButton.style.visibility = 'unset';
+    projetForm.style.display = 'flex';
+    h3.textContent = "Ajout Photo";
+    dialogButton.textContent = "Valider";
+}
 
-    let mainContainer = document.querySelectorAll('.main-container')[0]
+function switchToGalleryMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton) {
+    galleryProjetsContainer.style.display = '';
+    arrowLeftButton.style.visibility = 'hidden';
+    projetForm.style.display = 'none';
+    h3.textContent = "Galerie photo";
+    dialogButton.textContent = "Ajouter une photo";
+    initFormDialog();
+}
 
-    // Bandeau du haut mode edition
-    let divEditMessage = document.createElement('div')
-    divEditMessage.setAttribute('style', "background-color: black; width: 100%; height: 59px; display: flex; justify-content: center; align-items: center;");
+// ====================== INITIALISATION ======================
+loadToken();
 
-    let divMessageEditText = document.createElement('p')
-    let icondivMessageEditText = document.createElement('i')
-    icondivMessageEditText.setAttribute('class', 'fa-regular fa-pen-to-square')
-    divMessageEditText.appendChild(icondivMessageEditText)
+if (userConnected) {
+    // Bannière mode édition
+    const mainContainer = document.querySelector('.main-container');
+    const editBanner = document.createElement('div');
+    editBanner.style.cssText = "background-color: black; width: 100%; height: 59px; display: flex; justify-content: center; align-items: center;";
+    editBanner.innerHTML = `
+        <p style="color: white; display: flex; column-gap: 15px; align-items: center;">
+            <i class="fa-regular fa-pen-to-square"></i>
+            <span>Mode édition</span>
+        </p>`;
+    mainContainer.before(editBanner);
 
-    let divtextEdit = document.createElement('div')
-    divtextEdit.textContent = 'Mode édition'
-    divMessageEditText.appendChild(divtextEdit)
-    divMessageEditText.setAttribute('style', 'color: white; display: flex; column-gap: 15px;')
-    divEditMessage.appendChild(divMessageEditText)
-    mainContainer.before(divEditMessage)
+    // Logout
+    const logButton = document.getElementById('logButton');
+    logButton.textContent = "logout";
+    logButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        deleteToken();
+        window.location = "./views/login.html";
+    });
 
-    // Changement de texte du bouton login pour logout
-    let buttons = document.querySelectorAll('nav li a')
-    let EditDialog = document.querySelector('#edit-dialogue')
-    let showDialog = document.querySelector('#showDialog')
-    //TODO A modifier (à créer en javascript)
-    showDialog.style = "display: flex;"
+    // Cacher les filtres
+    document.querySelector('#portfolio .filterContainer').style.display = "none";
 
-    let logButton = document.getElementById('logButton')
+    // Références dialogue
+    const EditDialog = document.getElementById('edit-dialogue');
+    const showDialogBtn = document.getElementById('showDialog');
+    const galleryEdit = document.querySelector('#edit-dialogue .gallery-edit');
+    const galleryProjetsContainer = document.querySelector('#edit-dialogue .editPageContainer');
+    const projetForm = document.getElementById('projet-form');
+    const h3 = document.querySelector('#edit-dialog_entete h3');
+    const arrowLeftButton = document.querySelector('#edit-dialog-entete-button .fa-arrow-left');
+    const dialogButton = document.getElementById('dialogButton');
+    const uploadBtn = document.getElementById("uploadBtn");
+    const imageInput = document.getElementById("imageInput");
+    const errorMessageEl = document.getElementById('error-message');
 
-    buttons.forEach(btn => {
-        if (btn.textContent === "login") {
-            btn.textContent = "logout"
-        }
-    })
+    showDialogBtn.style.display = "flex";
 
-    logButton.addEventListener('click', function(event) {
-        event.preventDefault()
-        if (logButton.textContent = "logout") {
-            deleteToken()
-            //TODO : A la deconnexion de l'utilisateur, faut-il rediriger vers login.html ou rester su index.html ?
-            window.location = "./views/login.html";
-        }
-    })
-
-    // Cache les Filtres catégorie
-    divFilterContainer.setAttribute('style', "display: none;");
-
-    // Dialog + bouton showDialog
-    showDialog.addEventListener('click', function(event) {
-        event.preventDefault()
+    // === Écouteurs du dialogue (ajoutés UNE SEULE FOIS) ===
+    showDialogBtn.addEventListener('click', (e) => {
+        e.preventDefault();
         EditDialog.showModal();
         document.body.style.overflow = "hidden";
-        
-        projectsList.forEach(project => {
-            displayProjectDialog(project)
-        })
-    })
 
-    let dialog = document.getElementById('edit-dialogue')
-    dialog.addEventListener("click", (event) => {
-        if (event.target === dialog) {
-            dialog.close();
-        }
-    })
+        galleryEdit.innerHTML = "";
+        projectsList.forEach(project => displayProjectDialog(project, galleryEdit));
+    });
 
-    dialog.addEventListener('close', function() {
-        let galleryList = document.querySelectorAll('.gallery-edit')[0]
-        galleryList.innerHTML = ""
-        initFormDialog()
-    })
+    EditDialog.addEventListener("click", (event) => {
+        if (event.target === EditDialog) EditDialog.close();
+    });
 
-    let closeButtonDialog = document.querySelectorAll('.fa-xmark')[0]
-
-    closeButtonDialog.addEventListener('click', function(event) {
-        EditDialog.close()
+    EditDialog.addEventListener('close', () => {
+        galleryEdit.innerHTML = "";
+        initFormDialog();
         document.body.style.overflow = "";
-    })
+    });
 
-    let galleryProjetsContainer = document.querySelectorAll('#edit-dialogue .editPageContainer')[0]
-    let projetForm = document.getElementById('projet-form')
-    let arrowLeftButton = document.querySelectorAll('#edit-dialog-entete-button .fa-arrow-left')[0]
-    let dialogButton = document.getElementById('dialogButton')
+    document.querySelector('.fa-xmark').addEventListener('click', () => {
+        EditDialog.close();
+    });
 
-    dialogButton.addEventListener('click', async function(event) {
-        event.preventDefault()
+    // Flèche retour (ajoutée une seule fois)
+    arrowLeftButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchToGalleryMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
+    });
 
-        // Upload Photo projet
-        const uploadBtn = document.getElementById("uploadBtn");
-        let imageInput = document.getElementById("imageInput");
-        let errorMessage = document.getElementById('error-message')
+    // Upload + preview (ajoutés une seule fois !)
+    uploadBtn.addEventListener("click", () => imageInput.click());
 
-        switch (dialogButton.textContent) {
+    imageInput.addEventListener("change", (event) => {
+        errorMessageEl.textContent = "";
+        const file = imageInput.files[0];
+        if (!file) return;
 
-            case "Ajouter une photo":
-                
-                galleryProjetsContainer.setAttribute('style', 'display: none;')
-                arrowLeftButton.setAttribute('style', 'visibility: unset;')
-                projetForm.setAttribute('style', 'display: flex; flex-direction: column; flex: 4')
-                let h3 = document.querySelectorAll('#edit-dialog_entete h3')[0]
-                h3.textContent = "Ajout Photo"
-
-                dialogButton.textContent="Valider"
-
-                arrowLeftButton.addEventListener('click', function(event) {
-                    event.preventDefault()
-
-                    galleryProjetsContainer.setAttribute('style', '')
-                    arrowLeftButton.setAttribute('style', 'visibility: hidden;')
-                    //TODO: Vider le formulaire ????
-                    projetForm.setAttribute('style', 'display: none')
-                    h3.textContent = "Galerie photo"
-                    dialogButton.textContent="Ajouter une photo"
-
-                })
-
-                let categorySelect = document.querySelectorAll('#valid_form select')[0]
-
-                if (categorySelect.children.length <= 1) {
-                    categories.forEach((category) => {
-                        let option = document.createElement('option')
-                        option.value = category.id
-                        option.textContent = category.name
-                        categorySelect.appendChild(option)
-                    })
-                }
-
-                uploadBtn.addEventListener("click", () => {
-                    imageInput.click();
-                });
-
-                
-                imageInput.addEventListener("change", function(event) {
-                    event.preventDefault()
-
-                    errorMessage.textContent = "";
-                    let file = imageInput.files[0]
-                    if (!file) return;
-
-                    const maxSize = 4 * 1024 * 1024; //4mo
-                    const allowedTypes = ["image/jpeg", "image/png"];
-
-                    if (!allowedTypes.includes(file.type)) {
-                        errorMessage.textContent = "Seules les images JPG et PNG sont autorisées.";
-                        imageInput.value = "";
-                        return;
-                    }
-
-                    if (file.size > maxSize) {
-                        errorMessage.textContent = "La taille maximale est de 4 Mo.";
-                        imageInput.value = "";
-                        return;
-                    }
-
-                    let imageAddContainerDialog = document.querySelectorAll('.imageAddContainerDialog')[0]
-                    imageAddContainerDialog.setAttribute('style', 'height: stretch; margin: 0; width: auto;')
-
-                    let image = document.querySelectorAll('.imageAddContainerDialog img')[0]
-                    image.src = `./assets/images/${file.name}`
-                    image.setAttribute('style', 'height: 100%;')
-
-                    let ajouterButtonContainerDialog = document.querySelectorAll('.ajouterButtonContainerDialog')[0]
-                    ajouterButtonContainerDialog.setAttribute('style', 'display: none;')
-                    
-                    return;
-                });
-
-                break;
-        
-            case "Valider":
-                
-                errorMessage.textContent = ""
-
-                //Vérification de la validité des champs
-                let titre = document.querySelector("#titre").value;
-                let category = document.getElementById('categoriesSelect').value
-
-                // Si pas ok, affichage message d'erreur
-                if (imageInput.value === "") { 
-                    errorMessage.textContent = "Veuillez sélectionner une photo."
-                    break;
-                }
-                if (!titre.match(/^([\wàâäéèêëïîôöùûüç'" -~]+)$/)) { 
-                    errorMessage.textContent = 'Le titre ne doit pas être vide ou comporter des caractères spéciaux'
-                    break;
-                }
-                if (category === "") { 
-                    errorMessage.textContent = "Veuillez sélectionner une catégorie."
-                    break;
-                }
-
-                // Si ok, post du nouveau projet
-                let file = imageInput.files[0]
-                let projet = {
-                    title: titre,
-                    categoryId : category
-                }
-
-                console.log('new project', projet)
-
-                const formData = new FormData();
-                formData.append("title", titre);
-                formData.append("category", category);
-                formData.append("image", file);
-
-                fetch("http://localhost:5678/api/works/", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": 'Bearer ' + token
-                    },
-                    body: formData,
-                })
-                .then(res => res.json())
-                .then((data) => {
-                    if (data) {
-
-                        //Rafraichissement nouvelle image dans le dialog + portfolio
-                        displayProjectDialog(data)
-                        displayProject(data)
-
-                        //Vider les input
-                        initFormDialog()
-
-                        imageInput.removeEventListener('change')
-
-                        alert("Le projet a été ajouté avec succés !")
-                        
-                    }
-                    else {
-                        alert("Impossible d'ajouter le nouveau projet !")
-                    }
-                }).catch(error => console.log(error));                
-
-                break;
-            default:
-                break;
+        if (!allowedTypes.includes(file.type)) {
+            errorMessageEl.textContent = "Seules les images JPG et PNG sont autorisées.";
+            imageInput.value = "";
+            return;
         }
-    })
-}
-
-function fetchCategories() {
-
-    fetch('http://localhost:5678/api/categories')
-    .then(response => response.json())
-    .then(cats => {
-        // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
-        categories = cats
-
-        displayFilterAll()
-
-        for(let i = 0; i < cats.length; i++){
-
-            displayCategory(cats[i]); 
+        if (file.size > maxSize) {
+            errorMessageEl.textContent = "La taille maximale est de 4 Mo.";
+            imageInput.value = "";
+            return;
         }
 
-        filterButtons = document.querySelectorAll('#portfolio .filterButton')
+        if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = URL.createObjectURL(file);
 
-        filterButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault()
+        const container = document.querySelector('.imageAddContainerDialog');
+        container.style.cssText = 'height: stretch; margin: 0; width: auto;';
 
-                let id = button.id.split('_')[1]
+        const preview = document.querySelector('.imageAddContainerDialog img');
+        preview.src = currentObjectUrl;
+        preview.style.height = '100%';
 
-                if (parseInt(id) === 0) {
-                    projectsListFiltered = projectsList
-                }
-                else {
-                    projectsListFiltered = projectsList.filter(p => p.categoryId === parseInt(id))                
-                }
+        document.querySelector('.ajouterButtonContainerDialog').style.display = 'none';
+    });
 
-                deleteFilterSelected()
-                button.classList.add('filterButtonSelected')
+    // Bouton principal (Ajouter / Valider)
+    dialogButton.addEventListener('click', async (event) => {
+        event.preventDefault();
 
-                //supression de toutes les figures avant d'en créer des nouvelles
-                gallery[0].querySelectorAll("figure").forEach(figure => figure.remove());
+        if (dialogButton.textContent === "Ajouter une photo") {
+            switchToAddMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
 
-                projectsListFiltered.forEach(project => displayProject(project))
+            // Peuple le select catégories (une seule fois)
+            const select = document.getElementById('categoriesSelect');
+            if (select.children.length <= 1) {
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat.id;
+                    opt.textContent = cat.name;
+                    select.appendChild(opt);
+                });
+            }
+            return;
+        }
 
+        // ====================== CAS "VALIDER" ======================
+        errorMessageEl.textContent = "";
 
-        })
-        })
+        const titre = document.getElementById("titre").value.trim();
+        const categoryId = document.getElementById('categoriesSelect').value;
+        const file = imageInput.files[0];
 
+        if (!file) return errorMessageEl.textContent = "Veuillez sélectionner une photo.";
+        if (!titre || !/^[\wàâäéèêëïîôöùûüç'" -~]+$/.test(titre)) {
+            return errorMessageEl.textContent = 'Le titre ne doit pas être vide ou comporter de caractères spéciaux';
+        }
+        if (!categoryId) return errorMessageEl.textContent = "Veuillez sélectionner une catégorie.";
 
+        const formData = new FormData();
+        formData.append("title", titre);
+        formData.append("category", categoryId);
+        formData.append("image", file);
 
-    }).catch(error => console.log(error))
+        try {
+            const res = await fetch("http://localhost:5678/api/works/", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+                body: formData
+            });
 
+            const data = await res.json();
+
+            if (data && res.ok) {
+                displayProjectDialog(data, galleryEdit);
+                displayProject(data);
+
+                switchToGalleryMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
+                alert("Le projet a été ajouté avec succès !");
+            } else {
+                alert("Impossible d'ajouter le nouveau projet !");
+            }
+        } catch (err) {
+            console.error(err);
+        }
+    });
 }
 
-function checkValidityInput() {
+// ====================== CHARGEMENT DES DONNÉES ======================
+gallery = document.querySelector('.gallery');
 
-
-    if (!document.querySelector('#imageInput').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
-            alert('Le champs nom ne doit pas contenir de caractères spéciaux ou numériques');
-            return false;
-    } 
-    if (!document.querySelector('#firstname').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
-        alert('Le champs prénom ne doit pas contenir de caractères spéciaux ou numériques');
-        return false;
-    }
-    if (!document.querySelector('#email').value.match(/^[\w]+\@[\w]+\.[a-z]{2,3}$/)){
-        alert('L\'adresse email renseignée n\'est pas valide. Elle doit être sous la forme exemple@exemple.fr et ne pas contenir de caractères spéciaux');
-        return false;
-    }
-    if (!document.querySelector('#address').value.match(/^([\wàâäéèêëïîôöùûüç' ]+)$/)){
-        alert('Le champs Adresse ne doit pas contenir de caractères spéciaux ou numériques');
-        return false;
-    }
-    if (!document.querySelector('#city').value.match(/^([a-zA-Zàâäéèêëïîôöùûüç' -]+)$/)){
-        alert('Le champs ville ne doit pas contenir de caractères spéciaux ou numériques');
-        return false;
-    }
-
-    return true;
-
-}
-
-// Récupération de l'api
 fetch('http://localhost:5678/api/works')
-.then(response => response.json())
-.then(projects => {
+    .then(res => res.json())
+    .then(projects => {
+        projectsList = projects;
+        projects.forEach(project => displayProject(project));
+    })
+    .catch(console.error);
 
-    projectsList = projects
-    // Récupération de la liste des projets de Sophie. Boucle pour création éléments html
-    for(let i = 0; i < projects.length; i++){
-        
-        displayProject(projects[i]);
-        
-    }
-}).catch(error => console.log(error))
+fetch('http://localhost:5678/api/categories')
+    .then(res => res.json())
+    .then(cats => {
+        categories = cats;
+        const filterContainer = document.querySelector('#portfolio .filterContainer');
+        displayFilterAll();
 
-fetchCategories()
+        cats.forEach(cat => displayCategory(cat));
+
+        // Filtres
+        document.querySelectorAll('.filterButton').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = parseInt(button.id.split('_')[1]);
+
+                const filtered = id === 0
+                    ? projectsList
+                    : projectsList.filter(p => p.categoryId === id);
+
+                deleteFilterSelected();
+                button.classList.add('filterButtonSelected');
+
+                gallery.innerHTML = "";
+                filtered.forEach(project => displayProject(project));
+            });
+        });
+    })
+    .catch(console.error);
+//</DOCUMENT>
