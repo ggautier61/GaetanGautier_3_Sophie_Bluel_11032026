@@ -336,6 +336,10 @@ margin: auto;
 	flex-direction: column;
 }
 
+#projet-form form {
+	margin-top: 0;
+}
+
 #contact input, #login input, #edit-dialogue button, 
 #projet-form input,
 #projet-form select {

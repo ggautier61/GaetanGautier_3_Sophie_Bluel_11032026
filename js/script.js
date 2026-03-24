@@ -106,9 +106,12 @@ function initFormDialog() {
         currentObjectUrl = null;
     }
 
+    console.log('initForm');
     document.getElementById("titre").value = "";
     document.getElementById('categoriesSelect').value = "";
     document.getElementById("imageInput").value = "";
+    document.getElementById("error-message").value = "";
+    console.log('value', document.getElementById("error-message").value);
 
     const previewImg = document.querySelector('.imageAddContainerDialog img');
     previewImg.src = "./assets/icons/Image.png";
@@ -125,6 +128,7 @@ function switchToAddMode(h3, arrowLeftButton, projetForm, galleryProjetsContaine
     galleryProjetsContainer.style.display = 'none';
     arrowLeftButton.style.visibility = 'unset';
     projetForm.style.display = 'flex';
+    projetForm.style.height="100%"
     h3.textContent = "Ajout Photo";
     dialogButton.textContent = "Valider";
 }
@@ -204,13 +208,13 @@ if (userConnected) {
         EditDialog.close();
     });
 
-    // Flèche retour (ajoutée une seule fois)
+    // Flèche retour
     arrowLeftButton.addEventListener('click', (e) => {
         e.preventDefault();
         switchToGalleryMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
     });
 
-    // Upload + preview (ajoutés une seule fois !)
+    // Upload + preview
     uploadBtn.addEventListener("click", () => imageInput.click());
 
     imageInput.addEventListener("change", (event) => {
@@ -249,7 +253,6 @@ if (userConnected) {
         if (dialogButton.textContent === "Ajouter une photo") {
             switchToAddMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
 
-            // Peuple le select catégories (une seule fois)
             const select = document.getElementById('categoriesSelect');
             if (select.children.length <= 1) {
                 categories.forEach(cat => {
@@ -342,4 +345,3 @@ fetch('http://localhost:5678/api/categories')
         });
     })
     .catch(console.error);
-//</DOCUMENT>
