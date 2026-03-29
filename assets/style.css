@@ -55,6 +55,16 @@ body {
 	max-width: 1140px;
 	margin: auto;
 }
+
+.editBanner {
+	background-color: black;
+	width: 100%;
+	height: 59px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 header {
 	display: flex;
 	justify-content: space-between;
@@ -241,10 +251,11 @@ dialog .galleryProjetsContainer {
 	padding-left: 105px;
 	padding-right: 105px;
 	box-sizing: border-box;
-	height: 560px;
+	height: 100%;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	overflow: overlay;
 }
 
 #edit-dialogue i:hover {
@@ -266,6 +277,20 @@ dialog .galleryProjetsContainer {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
+}
+
+.deleteContainer {
+	width: 17px;
+	height: 17px;
+	padding: 3px;
+	position: absolute;
+	right: 5px;
+	top: 6px;
+	background-color: black;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .buttonContainer {
@@ -307,6 +332,7 @@ dialog .galleryProjetsContainer {
 	grid-row-gap: 29px;
 	grid-auto-rows: max-content;
 	flex: 4;
+	overflow: overlay;
 }
 
 .gallery-edit figure img {

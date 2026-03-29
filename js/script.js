@@ -1,4 +1,3 @@
-//<DOCUMENT filename="script.js">
 let token = "";
 let userConnected = false;
 
@@ -9,8 +8,8 @@ let gallery;
 // ====================== FONCTIONS D'AFFICHAGE ======================
 function loadToken() {
     const stored = localStorage.getItem('bearer');
-    token = stored ? JSON.parse(stored) : "";
-    userConnected = !!token;
+    userConnected = !!stored;
+    token = stored ?? stored;
 }
 
 function deleteToken() {
@@ -64,9 +63,9 @@ function displayProjectDialog(project, galleryEdit) {
     img.style.position = 'relative';
     figure.appendChild(img);
 
-    // Bouton delete (positionné en absolute)
+    // Bouton delete
     const deleteContainer = document.createElement('div');
-    deleteContainer.style.cssText = 'width: 17px; height: 17px; padding: 3px; position: absolute; right: 5px; top: 6px; background-color: black; color: white; display: flex; justify-content: center; align-items: center;';
+    deleteContainer.classList.add("deleteContainer");
     figure.appendChild(deleteContainer);
 
     const deleteIcon = document.createElement('i');
@@ -87,14 +86,20 @@ function displayProjectDialog(project, galleryEdit) {
             if (res.ok) {
                 document.getElementById(`projectFigureEdit_${project.id}`)?.remove();
                 document.getElementById(`project_${project.id}`)?.remove();
+                fetch('http://localhost:5678/api/works')
+                .then(res => res.json())
+                .then(projects => {
+                    projectsList = projects;                    
+                })
+                .catch(console.error);
             } else {
                 alert('Impossible de supprimer le projet !');
             }
-        } catch (e) {}
+        } catch (e) { }
     });
 }
 
-// ====================== GESTION DU DIALOGUE (nettoyée) ======================
+// ====================== GESTION DU DIALOGUE ======================
 let currentObjectUrl = null;
 
 const maxSize = 4 * 1024 * 1024;
@@ -106,12 +111,10 @@ function initFormDialog() {
         currentObjectUrl = null;
     }
 
-    console.log('initForm');
     document.getElementById("titre").value = "";
     document.getElementById('categoriesSelect').value = "";
     document.getElementById("imageInput").value = "";
     document.getElementById("error-message").value = "";
-    console.log('value', document.getElementById("error-message").value);
 
     const previewImg = document.querySelector('.imageAddContainerDialog img');
     previewImg.src = "./assets/icons/Image.png";
@@ -149,7 +152,7 @@ if (userConnected) {
     // Bannière mode édition
     const mainContainer = document.querySelector('.main-container');
     const editBanner = document.createElement('div');
-    editBanner.style.cssText = "background-color: black; width: 100%; height: 59px; display: flex; justify-content: center; align-items: center;";
+    editBanner.classList.add("editBanner");
     editBanner.innerHTML = `
         <p style="color: white; display: flex; column-gap: 15px; align-items: center;">
             <i class="fa-regular fa-pen-to-square"></i>
@@ -184,7 +187,7 @@ if (userConnected) {
 
     showDialogBtn.style.display = "flex";
 
-    // === Écouteurs du dialogue (ajoutés UNE SEULE FOIS) ===
+    // Écouteurs du dialogue
     showDialogBtn.addEventListener('click', (e) => {
         e.preventDefault();
         EditDialog.showModal();
@@ -250,6 +253,7 @@ if (userConnected) {
     dialogButton.addEventListener('click', async (event) => {
         event.preventDefault();
 
+        // =================== CAS AJOUTER ==========================
         if (dialogButton.textContent === "Ajouter une photo") {
             switchToAddMode(h3, arrowLeftButton, projetForm, galleryProjetsContainer, dialogButton);
 
@@ -290,9 +294,19 @@ if (userConnected) {
                 body: formData
             });
 
+            console.log(res);
+
             const data = await res.json();
 
             if (data && res.ok) {
+
+                fetch('http://localhost:5678/api/works')
+                    .then(res => res.json())
+                    .then(projects => {
+                        projectsList = projects;                    
+                    })
+                    .catch(console.error);
+
                 displayProjectDialog(data, galleryEdit);
                 displayProject(data);
 

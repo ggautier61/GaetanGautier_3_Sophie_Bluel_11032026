@@ -2,7 +2,7 @@ const form = document.getElementById("loginForm");
 const errorMessage = document.getElementById("error-message");
 
 function setTokenLocalStorage(token) {
-     localStorage.setItem('bearer', JSON.stringify(token));
+     localStorage.setItem('bearer', token);
 }
 
 form.addEventListener("submit", async (event) => {
